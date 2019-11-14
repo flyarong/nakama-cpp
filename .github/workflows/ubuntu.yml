@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     
     container:
       image: dimon4eg/ubuntu_nakama_base:u1804_b169_c3155
@@ -13,6 +13,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+      with:
+        submodules: recursive
     
     - name: build
       run: cd build/linux && ./build_linux.py
