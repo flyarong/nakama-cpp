@@ -18,12 +18,20 @@ jobs:
     
     - name: build
       run: cd build/linux && ./build_linux.py
-    
+
+  nakama-server:
+    runs-on: ubuntu-18.04
+    needs: [build]
+
+    steps:
     - name: get docker-compose
       run: wget https://raw.githubusercontent.com/heroiclabs/nakama/master/docker-compose.yml
 
+    - name: cur dir
+      run: echo $PWD
+
     - name: nakama-server
-      run: docker-compose -f docker-compose.yml up
+      run: docker-compose -f docker-compose.yml up -d
 
     - name: tests
       run: build/linux/build/Release_x64/test/nakama-test
