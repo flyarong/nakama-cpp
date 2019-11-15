@@ -28,7 +28,7 @@ jobs:
       run: wget https://raw.githubusercontent.com/heroiclabs/nakama/master/docker-compose.yml
 
     - name: cur dir
-      run: echo $PWD
+      run: echo $PWD && ls
 
     - name: nakama-server
       run: docker-compose -f docker-compose.yml up -d
