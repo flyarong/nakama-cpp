@@ -18,3 +18,12 @@ jobs:
     
     - name: build
       run: cd build/linux && ./build_linux.py
+    
+    - name: get docker-compose
+      run: wget https://raw.githubusercontent.com/heroiclabs/nakama/master/docker-compose.yml
+
+    - name: nakama-server
+      run: docker-compose -f docker-compose.yml up
+
+    - name: tests
+      run: build/linux/build/Release_x64/test/nakama-test
