@@ -17,13 +17,22 @@ jobs:
         submodules: recursive
 #        fetch-depth: 1
     
-    - name: build
+    - name: build static
       run: cd build/linux && ./build_linux.py
     
-    - name: upload test binary
+    - name: upload static test binary
       uses: actions/upload-artifact@v1
       with:
         name: nakama-test
+        path: build/linux/build/Release_x64/test/nakama-test
+
+    - name: build shared
+      run: cd build/linux && ./build_linux.py --so
+    
+    - name: upload shared test binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: nakama-test-so
         path: build/linux/build/Release_x64/test/nakama-test
 
   nakama-server:
@@ -31,16 +40,24 @@ jobs:
     needs: [build]
 
     steps:
-    - name: download test binary
+    - name: download static test binary
       uses: actions/download-artifact@v1
       with:
         name: nakama-test
 
+    - name: download shared test binary
+      uses: actions/download-artifact@v1
+      with:
+        name: nakama-test-so
+
     - name: get docker-compose
       run: wget https://raw.githubusercontent.com/heroiclabs/nakama/master/docker-compose.yml
 
-    - name: chmod
+    - name: chmod static
       run: chmod u=rwx nakama-test/nakama-test
+
+    - name: chmod so
+      run: chmod u=rwx nakama-test-so/nakama-test
 
     - name: cur dir
       run: echo $PWD && cd nakama-test && ls -l
@@ -48,5 +65,8 @@ jobs:
     - name: nakama-server
       run: docker-compose -f docker-compose.yml up -d
 
-    - name: run tests
+    - name: run tests (static)
       run: nakama-test/nakama-test
+
+    - name: run tests (shared)
+      run: nakama-test-so/nakama-test
