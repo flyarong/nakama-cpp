@@ -19,20 +19,31 @@ jobs:
     
     - name: build
       run: cd build/linux && ./build_linux.py
+    
+    - name: upload test binary
+      uses: actions/upload-artifact@v1
+      with:
+        name: nakama-test
+        path: build/linux/build/Release_x64/test/nakama-test
 
   nakama-server:
     runs-on: ubuntu-18.04
     needs: [build]
 
     steps:
+    - name: download test binary
+      uses: actions/download-artifact@v1
+      with:
+        name: nakama-test
+
     - name: get docker-compose
       run: wget https://raw.githubusercontent.com/heroiclabs/nakama/master/docker-compose.yml
 
     - name: cur dir
-      run: echo $PWD && ls
+      run: echo $PWD && ls -l
 
     - name: nakama-server
       run: docker-compose -f docker-compose.yml up -d
 
     - name: tests
-      run: build/linux/build/Release_x64/test/nakama-test
+      run: nakama-test/nakama-test
