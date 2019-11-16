@@ -39,8 +39,11 @@ jobs:
     - name: get docker-compose
       run: wget https://raw.githubusercontent.com/heroiclabs/nakama/master/docker-compose.yml
 
+    - name: chmod
+      run: chmod u=rwx nakama-test/nakama-test
+
     - name: cur dir
-      run: echo $PWD && ls -l
+      run: echo $PWD && cd nakama-test && ls -l
 
     - name: nakama-server
       run: docker-compose -f docker-compose.yml up -d
