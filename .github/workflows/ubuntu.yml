@@ -17,13 +17,16 @@ jobs:
         submodules: recursive
 #        fetch-depth: 1
 
-    - name: cache third party
+    - name: cache third party build
       id: cache_third_party
       uses: actions/cache@v1
       with:
         path: build/linux/build/Release_x64/third_party
         key: ${{ runner.os }}-third_party
-    
+
+    - name: ls third_party
+      run: cd build/linux/build/Release_x64/third_party && ls -l
+
     - name: build static
       run: cd build/linux && ./build_linux.py
     
