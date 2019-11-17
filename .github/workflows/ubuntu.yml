@@ -17,13 +17,6 @@ jobs:
         submodules: recursive
 #        fetch-depth: 1
 
-    - name: cache build
-      id: cache_build
-      uses: actions/cache@v1
-      with:
-        path: build/linux/build/Release_x64
-        key: ${{ runner.os }}-Release_x64
-
     - name: build static
       run: cd build/linux && ./build_linux.py
     
