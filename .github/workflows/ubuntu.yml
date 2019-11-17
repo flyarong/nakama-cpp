@@ -57,7 +57,7 @@ jobs:
 #      with:
 #        name: nakama-test-so
 
-    - name: get docker-compose
+    - name: get latest nakama docker-compose.yml
       run: wget https://raw.githubusercontent.com/heroiclabs/nakama/master/docker-compose.yml
 
     - name: chmod static
@@ -69,7 +69,7 @@ jobs:
     - name: cur dir
       run: echo $PWD && cd nakama-test && ls -l
 
-    - name: nakama-server
+    - name: start nakama-server
       run: docker-compose -f docker-compose.yml up -d
 
     - name: run tests (static)
