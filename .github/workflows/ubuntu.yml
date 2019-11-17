@@ -57,6 +57,9 @@ jobs:
 #      with:
 #        name: nakama-test-so
 
+    - name: get nakama default lua modules
+      run: git clone --depth 1 https://github.com/heroiclabs/nakama-modules .
+
     - name: get latest nakama docker-compose.yml
       run: wget https://raw.githubusercontent.com/heroiclabs/nakama/master/docker-compose.yml
 
