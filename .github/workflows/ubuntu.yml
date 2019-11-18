@@ -33,7 +33,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: nakama-test-so
-        path: build/linux/build/Release_x64/test/nakama-test
+        path: build/linux/build/Release_x64/test
 
   nakama-server:
     runs-on: ubuntu-16.04
@@ -75,4 +75,4 @@ jobs:
 #      run: nakama-test/nakama-test
 
     - name: run tests (shared)
-      run: nakama-test-so/nakama-test
+      run: cd nakama-test-so && export LD_LIBRARY_PATH=. && ./nakama-test
