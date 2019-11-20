@@ -3,7 +3,7 @@ name: Ununtu 18.04
 on: [push]
 
 jobs:
-  build:
+  build_nakama-cpp:
     runs-on: ubuntu-18.04
     
     container:
@@ -35,9 +35,21 @@ jobs:
         name: nakama-test-so
         path: build/linux/build/Release_x64/test
 
-  nakama-server:
+  build_example:
+    runs-on: ubuntu-18.04
+    
+    container:
+      image: dimon4eg/ubuntu_nakama_base:u1804_b169_c3155
+      volumes:
+        - my_docker_volume:/volume_mount
+    
+    steps:
+    - name: build example with shared lib
+      run: cd examples/nakama-cmake-client-example/build/linux && ./build_linux.py --so
+
+  test:
     runs-on: ubuntu-16.04
-    needs: [build]
+    needs: [build_nakama-cpp]
 
     steps:
     - name: download static test binary
