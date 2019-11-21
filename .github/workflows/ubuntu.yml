@@ -44,6 +44,9 @@ jobs:
         - my_docker_volume:/volume_mount
     
     steps:
+    - name: cur dir
+      run: echo $PWD && ls -l
+
     - name: build example with shared lib
       run: cd examples/nakama-cmake-client-example/build/linux && ./build_linux.py --so
 
