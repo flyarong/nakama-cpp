@@ -21,7 +21,7 @@ import subprocess
 
 USE_CPPREST = False
 BUILD_MODE = 'Release'
-TARGET_PLATFORM = '' # mac, ios, android, windows, linux
+TARGET_PLATFORM = '' # mac, ios, tvos, android, windows, linux
 
 def init_common(build_common_path, target_platform):
     if build_common_path.find(' ') >= 0:
@@ -139,7 +139,7 @@ def copy_libs():
         copy_rest_lib()
 
 def set_install_name(dylib_path):
-    if (IOS_RPATH_ENABLE and TARGET_PLATFORM == 'ios') or (MAC_RPATH_ENABLE and TARGET_PLATFORM == 'mac'):
+    if (IOS_RPATH_ENABLE and TARGET_PLATFORM == 'ios') or (TVOS_RPATH_ENABLE and TARGET_PLATFORM == 'tvos') or (MAC_RPATH_ENABLE and TARGET_PLATFORM == 'mac'):
         path = '@rpath'
     else:
         path = '@executable_path'
