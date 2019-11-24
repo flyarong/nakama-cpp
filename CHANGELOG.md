@@ -4,6 +4,10 @@ All notable changes to this project are documented below.
 
 The format is based on [keep a changelog](http://keepachangelog.com/) and this project uses [semantic versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+- Support tvOS (AppleTV).
+
 ## [2.2.4] - 2019-11-21
 ### Added
 - install_deps.sh for linux to install dependencies
