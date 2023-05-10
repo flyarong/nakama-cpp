@@ -1,180 +1,19 @@
 Nakama C/C++ Client SDK
 =============
 
-[![GitHub release](https://img.shields.io/github/release/heroiclabs/nakama-cpp.svg)](https://github.com/heroiclabs/nakama-cpp/releases/latest)
-[![Forum](https://img.shields.io/badge/forum-online-success.svg)](https://forum.heroiclabs.com)
-[![Client guide](https://img.shields.io/badge/client_guide-online-brightgreen)](https://heroiclabs.com/docs/cpp-client-guide)
-[![Reference](https://img.shields.io/badge/reference-online-brightgreen)](https://heroiclabs.github.io/nakama-cpp/html/index.html)
-[![Github all releases](https://img.shields.io/github/downloads/heroiclabs/nakama-cpp/total.svg)](https://github.com/heroiclabs/nakama-cpp/releases/)
-[![License](https://img.shields.io/github/license/heroiclabs/nakama.svg)](https://github.com/heroiclabs/nakama/blob/master/LICENSE)
-
-> General C/C++ client for Nakama server.
+> C/C++ client for Nakama server.
 
 [Nakama](https://github.com/heroiclabs/nakama) is an open-source server designed to power modern games and apps. Features include user accounts, chat, social, matchmaker, realtime multiplayer, and much [more](https://heroiclabs.com).
 
-This client implements the full API and socket options with the server. It's written in C and C++11 with minimal dependencies to support Cocos2d-x, Unreal and other custom engines and frameworks.
+This client implements the full API and socket options with the server. It's written in C and C++11 with minimal dependencies to support Unreal, Cocos2d-x, Oculus, and other custom engines and frameworks.
 
-If you experience any issues with the client, it can be useful to enable debug logs (see [Logging](#logging) section) and [open an issue](https://github.com/heroiclabs/nakama-cpp/issues).
+We also support various game consoles. Please reach out to support@heroiclabs.com to discuss console support for your project.
+
+If you experience any issues with the client, [open an issue](https://github.com/heroiclabs/nakama-cpp/issues).
 
 Full documentation is online - https://heroiclabs.com/docs
 
-## Getting Started
-
-You'll need to setup the server and database before you can connect with the client. The simplest way is to use Docker but have a look at the [server documentation](https://github.com/heroiclabs/nakama#getting-started) for other options.
-
-1. Install and run the servers. Follow these [instructions](https://heroiclabs.com/docs/install-docker-quickstart).
-
-2. Nakama C/C++ SDK is released with prebuilt libraries for following platforms and architectures:
-
-- Windows - Visual Studio 2015, 2017, 2019 (x86, x64, Debug, Release)
-- Android - Android 4.1 (armeabi-v7a, arm64-v8a, x86, x86_64)
-- Linux - Ubuntu 18.04 x64
-- Mac - 10.10+
-- iOS - 5.0+ (arm64, armv7, armv7s, x86_64), Bitcode is off
-
-In theory any platform that meets the requirement for `cpprest` and `boost` is also supported. The client is compiled with C++11.
-
-3. Download the client from the [releases page](https://github.com/heroiclabs/nakama-cpp/releases). You can also [build from source](#source-builds).
-
-<!-- You can download clients that are tailored for [Cocos2d-x](https://github.com/heroiclabs/nakama-cocos2d-x) or [Unreal 4](https://github.com/heroiclabs/nakama-unreal). -->
-
-4. Integrate the client library into your project:
-
-When you've downloaded the Nakama C++ archive and extracted it to `NAKAMA_CPP_SDK` folder, you should include it in your project.
-
-We don't recommend to copy Nakama C++ SDK to your project because it's quite big in size (~1 Gb).
-
-### Setup for Mac and iOS projects
-
-1. Add `NAKAMA_CPP_SDK/include` in `Build Settings > Header Search Paths`
-
-2. Add libs folder in `Build Settings > Library Search Paths`:
-    - `NAKAMA_CPP_SDK/libs/ios` - for iOS
-    - `NAKAMA_CPP_SDK/libs/mac` - for Mac
-
-3. In `General > Linked Frameworks and Libraries` add following:
-    - all `.a` files located in libs folder
-    - `foundation` and `security` frameworks
-
-### Setup for Android projects
-
-If you use `CMake` then see [Setup for CMake projects](#setup-for-cmake-projects) section.
-
-If you use `ndk-build` then add following to your `Android.mk` file:
-
-```makefile
-# add this to your module
-LOCAL_STATIC_LIBRARIES += nakama-cpp
-
-# add this at bottom of Android.mk file
-$(call import-add-path, NAKAMA_CPP_SDK)
-$(call import-module, nakama-cpp-android)
-```
-
-#### Initialize Nakama SDK
-
-For most NativeActivity projects, if you have an entry point like:
-
-```cpp
-void android_main(struct android_app* state) {
-```
-
-Add include:
-
-```cpp
-#include "nakama-cpp/platform/android/android.h"
-```
-
-Add the following code at the top of the `android_main` function:
-
-```cpp
-Nakama::init(state->activity->vm);
-```
-
-#### Shared library size
-
-Don't be afraid that nakama shared library are near 100 Mb in size. After building final apk it will be just few Mb.
-
-#### Android permissions
-
-Android uses a permissions system which determines which platform services the application will request to use and ask permission for from the user. The client uses the network to communicate with the server so you must add the "INTERNET" permission.
-
-```xml
-<uses-permission android:name="android.permission.INTERNET"/>
-```
-
-### Setup for CMake projects
-
-To link Nakama's static lib add following to your `CMakeLists.txt` file:
-
-```cmake
-add_subdirectory(NAKAMA_CPP_SDK ${CMAKE_CURRENT_BINARY_DIR}/nakama-cpp)
-target_link_libraries(${APP_NAME} ext_nakama-cpp)
-```
-
-To link Nakama's shared lib add following to your `CMakeLists.txt` file:
-
-```cmake
-set(NAKAMA_SHARED_LIBRARY TRUE)
-add_subdirectory(NAKAMA_CPP_SDK ${CMAKE_CURRENT_BINARY_DIR}/nakama-cpp)
-target_link_libraries(${APP_NAME} ext_nakama-cpp)
-CopyNakamaSharedLib(${APP_NAME})
-```
-
-### Setup for Visual Studio projects
-
-In `Project Settings` add following:
-
-1. Add `NAKAMA_CPP_SDK/include` in `C/C++ > General > Additional Include Directories`
-2. Add libs folder in `Linker > General > Additional Library Directories`:
-    - `NAKAMA_CPP_SDK/libs/win32/v140` - for VS 2015 x86
-    - `NAKAMA_CPP_SDK/libs/win64/v140` - for VS 2015 x64
-    - `NAKAMA_CPP_SDK/libs/win32/v141` - for VS 2017 x86
-    - `NAKAMA_CPP_SDK/libs/win64/v141` - for VS 2017 x64
-    - `NAKAMA_CPP_SDK/libs/win32/v142` - for VS 2019 x86
-    - `NAKAMA_CPP_SDK/libs/win64/v142` - for VS 2019 x64
-3. Add all `.lib` files located in libs folder in `Linker > Input > Additional Dependencies`
-
-### Custom setup
-
-- add define:
-  * `NLOGS_ENABLED` - define it if you want to use Nakama logger. See [Logging](#logging) section
-- add include directory: `$(NAKAMA_CPP_SDK)/include`
-- add link directory: `$(NAKAMA_CPP_SDK)/libs/{platform}/{ABI}`
-- add all libraries for linking from link directory
-
-## Threading model
-
-Nakama C++ is designed to use in one thread only.
-
-## Usage
-
-### Use as static library
-
-Include nakama header and use nakama namespace.
-
-```cpp
-#include "nakama-cpp/Nakama.h"
-
-using namespace NAKAMA_NAMESPACE;
-```
-
-### Use as dynamic library
-
-Include nakama header and use nakama namespace.
-
-```cpp
-#include "nakama-cpp-c-wrapper/NakamaWrapper.h"
-
-using namespace NAKAMA_NAMESPACE;
-```
-
-Include following header only once in some source file e.g. in `main.cpp`:
-```cpp
-#include "nakama-cpp-c-wrapper/NakamaWrapperImpl.h"
-```
-
-This header includes implementation of Nakama C++ wrapper. It uses C interface to communicate with Nakama shared library (DLL).
+# Usage
 
 ### Client
 
@@ -270,7 +109,7 @@ The client can create one or more realtime clients with the server. Each realtim
 ```cpp
 bool createStatus = true; // if the socket should show the user as online to others.
 // define realtime client in your class as NRtClientPtr rtClient;
-rtClient = client->createRtClient(DEFAULT_PORT);
+rtClient = client->createRtClient();
 // define listener in your class as NRtDefaultClientListener listener;
 listener.setConnectCallback([]()
 {
@@ -333,7 +172,7 @@ NLogger::setLevel(NLogLevel::Debug);
 
 - `Fatal` writes only logs with `Fatal` logging level.
 
-Note: to use logging macroses you have to define `NLOGS_ENABLED`.
+Note: to use logging macros you have to define `NLOGS_ENABLED`.
 
 ### Websockets transport
 
@@ -344,13 +183,8 @@ Client will default to use the Websocket transport provided by [C++ REST SDK](ht
 You can use a custom Websocket transport by implementing the [NRtTransportInterface](https://github.com/heroiclabs/nakama-cpp/blob/master/include/nakama-cpp/realtime/NRtTransportInterface.h):
 
 ```cpp
-rtClient = client->createRtClient(port, websockets_transport);
+rtClient = client->createRtClient(websockets_transport);
 ```
-
-For more code examples, have a look at:
-
-* [NWebsocketCppRest](https://github.com/heroiclabs/nakama-cpp/blob/master/src/realtime/NWebsocketCppRest.h)
-* [NCocosWebSocket](https://github.com/heroiclabs/nakama-cocos2d-x/blob/master/example/Classes/NakamaCocos2d/NCocosWebSocket.h)
 
 #### Activity timeout
 
@@ -364,251 +198,237 @@ You can change ping period on server - `ping_period_ms` parameter:
 
 https://heroiclabs.com/docs/install-configuration/#socket
 
-## Contribute
+#### Android
 
-The development roadmap is managed as GitHub issues and pull requests are welcome. If you're interested to enhance the code please open an issue to discuss the changes or drop in and discuss it in the [community forum](https://forum.heroiclabs.com).
+To use our native C++ library in your Android application, you will need to include an additional .aar file that we ship for SSL support.
 
-## Source Builds
+For example, in Gradle:
 
-Clone the Nakama C++ repository:
-
-`git clone --recurse-submodules -j8 git://github.com/heroiclabs/nakama-cpp.git`
-
-To update all submodules:
-
-`git submodule update --init --recursive`
-
-Change submodule branch:
-
-- edit `.gitmodules`
-
-- `git submodule update --remote`
-
-### Build Prerequisites
-
-- git
-- python 2.7 or 3.x
-- cmake 3.14+
-- go
-- perl
-- Visual Studio 2015, 2017 or 2019 - for Windows only
-
-Third party libraries:
-
-- boost 1.69 - must be installed in system and set path to `BOOST_ROOT` system variable.
-  Used by `cpprest` library on Windows, Mac and Linux.
-- grpc - in source control as git submodule
-- optional-lite - in source control
-- cpprestsdk - in source control
-- rapidjson - in source control
-
-### Build Configuration
-
-Build configuration is located here:
-
-```bash
-build/build_config.py
+```
+implementation files("<path/to/libnakama-sdk.aar>")
 ```
 
-In the build configuration you can enable components depending on your needs.
+Then you will need to load our native library from Java by calling `System.loadLibrary("nakama-sdk")` when your activity is created.
 
-There are following components:
+# How to build
 
-* REST client (HTTP/1.1)
-* gRPC client
-* HTTP transport using C++ REST SDK
-* Websocket transport using C++ REST SDK
-* C API
-* Tests
+## Prerequisite
 
-In the config you can also set whenever you need to build `nakama-cpp` as static, dynamic library or both version.
+You should download vcpkg (https://github.com/microsoft/vcpkg) somewhere on your machine set your $VCPKG_ROOT environment variable to point to the
+repository.
 
-### Building for Windows
+### Windows
 
-```bash
-cd build\windows
-python build_windows.py -m Mode -a Arch -t Toolset --dll
+- [CMake >= 3.22](https://cmake.org/download/)
+- [Ninja](https://ninja-build.org/)
+- [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
+
+### Linux
+
+- CMake
+- Ninja
+- gcc-c++/clang++
+
+#### Ubuntu 18.04
+
+Fresh Ubuntu 18.04 setup:
+
 ```
-Where `Mode` is build mode: `Debug` or `Release`
-
-Where `Arch` is architecture: `x86` or `x64`
-
-Where `Toolset` is platform toolset:
-
-- `v140` - Visual Studio 2015
-- `v141` - Visual Studio 2017
-- `v142` - Visual Studio 2019
-
-`--dll` is optional parameter. If set then Nakama will be built as DLL otherwise as static library.
-
-It builds and copies nakama lib to release folder.
-
-To build for all modes, architectures and toolsets:
-
-```bash
-cd build\windows
-python build_windows_all.py
+sudo apt update
+sudo apt install git pkg-config g++ curl zip unzip tar make
+mkdir -p ~/opt; curl -L https://github.com/Kitware/CMake/releases/download/v3.23.1/cmake-3.23.1-linux-x86_64.tar.gz  | tar -C ~/opt -xzf -
+mkdir -p ~/bin; ln -s ~/opt/cmake-3.23.1-linux-x86_64/bin/cmake ~/bin/
+cd /tmp; curl -L -O https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-linux.zip; unzip ninja-linux.zip; mv ninja ~/bin
+exec /bin/bash -l   # make ~/bin available on PATH
+git clone /mnt/z/repos/nakama-cpp ~/localrepos/nakama-cpp
+cd ~/localrepos/nakama-cpp
+${VCPKG_ROOT}/bootstrap-vcpkg.sh
 ```
 
-### Building for Mac
+If you plan to use `WITH_LIBCXX`, then also do following:
 
-Prerequisites:
-```bash
-sudo xcode-select --install
-brew install autoconf automake libtool shtool
-brew install gflags
-brew install cmake ninja boost
+```
+sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+sudo apt install g++-11 python3-distutils
+export CC=/usr/bin/gcc-11
+export CXX=/usr/bin/g++-11
 ```
 
-Build:
+### OS X
 
-```bash
-cd build/mac
-python build_mac.py --dylib
+- brew install ninja cmake pkg-config
+- XCode or XCode command line tools
+
+## Build
+
+There are preconfigured presets in the [CMakePresets.json](./CMakePresets.json).
+You can get list of presets for your system with:
+
+```
+cmake --list-presets
 ```
 
-`--dylib` is optional parameter. If set then Nakama will be built as dynamic library otherwise as static.
+Then configure the build system.
 
-It builds in `Release` mode and copies nakama lib to release folder.
-
-### Building for iOS
-
-To build for one architecture:
-
-```bash
-cd build/ios
-python build_ios.py Arch --dylib
 ```
-Where `Arch` is architecture: `arm64`, `armv7`, `armv7s` or `x86_64`.
-
-`--dylib` is optional parameter. If set then Nakama will be built as dynamic library otherwise as static.
-
-It builds in `Release` mode.
-
-To build for all architectures `arm64`, `armv7`, `armv7s` and `x86_64`:
-
-```bash
-cd build/ios
-python build_ios_all.py
+cmake --preset linux-amd64
 ```
 
-It builds in `Release` mode, creates universal libraries and copies them to release folder.
+The configuration step builds all necessary dependencies and installs them under `./build/*/vcpkg_installed`.
 
-### Building for Linux
 
-We use Ubuntu 18.04 amd64.
+Next, build the SDK:
 
-Prerequisites:
-
-To automatically install all dependencies call:
-
-```bash
-build/linux/install_deps.sh
+```
+cmake --build build/linux-amd64 --config MinSizeRel --target install
 ```
 
-It will install all needed packages, will download and build boost and CMake.
+### Linux
 
-Execute command which will be printed at end.
+To build Linux release you can use provided Docker image like following:
 
-To manually install dependencies:
-
-- `sudo apt-get install build-essential autoconf libtool pkg-config`
-- `sudo apt-get install libgflags-dev libgtest-dev`
-- `sudo apt-get install clang libc++-dev golang perl`
-- download `boost` 1.69 sources and build them:
-
-  `./bootstrap.sh --with-libraries=system,chrono,thread`
-
-  `./b2`
-
-  set `BOOST_ROOT` env var to `boost` folder:
-
-  `export BOOST_ROOT={path to boost}`
-
-- download `cmake` 3.14+ sources and build them:
-
-  `./bootstrap && make && make install`
-
-To build nakama-cpp:
-
-```bash
-cd build/linux
-python build_linux.py --so
+```
+docker buildx build -f scripts/Dockerfile --progress=plain --output=./out .
 ```
 
-`--so` is optional parameter. If set then Nakama will be built as shared library otherwise as static.
+### Android
 
-It builds in `Release` mode and copies nakama lib to release folder.
+To build for Android set your `ANDROID_NDK_HOME` environment variable to your NDK before building.
 
-### Building for Android
+Your NDK is typically located within your SDK:`<sdk>/ndk/<ndk-version>`
 
-Currently buid for Android is supported from Mac OS.
+Our prebuilt libraries target Android NDK 25.1.8937393.
 
-Set `ANDROID_NDK` or `NDK_ROOT` system variable to Android NDK folder.
+### Windows 32-Bit
 
-To build for one ABI:
+We support native 32-bit builds. Keep in mind that when building from source, you must run your command
+in a 32-bit (e.g., C:\Windows\System32\cmd.exe) environment.
 
-```bash
-cd build/android
-python build_android.py ABI --so
+### Build modifiers
+
+Presets mostly represent platforms SDK can be built for. Sometimes
+within platforms build configuration need to be modified, but if we create
+preset for each build configuration we'd have too many of them. We have
+a way to alter build behaviour of any preset with a build modifiers mechanism.
+
+Supported build modifiers are:
+
+- `LIBHTTPCLIENT_FORCE_WEBSOCKETPP`: On Windows platforms libhttpclient always includes
+  websocketpp transport and uses it if Windows doesn't support websocket natively (< Windows 8).
+  You can set this build modifier to force use of websocketpp transport, so that it can be tested without
+  installing Windows 7. If you
+- `WITH_LIBCXX`: dynamically link with libc++ instead of libstdc++ on Linux platform.
+  - `LIBCXX_STATIC`: link libc++ statically
+- `ADDRESS_SANITIZER`: instrument library with [AddressSanitizer](https://github.com/google/sanitizers/wiki/AddressSanitizer)
+
+Build modifiers are CMake variables passed at configure time using `-D` switch.
+Example use:
+
 ```
-Where `ABI` is Android ABI e.g. `armeabi-v7a`, `arm64-v8a`, `x86` or `x86_64`
-
-`--so` is optional parameter. If set then Nakama will be built as shared library otherwise as static.
-
-It builds for Andoid API level 16 in `Release` mode.
-
-To build for all ABIs `armeabi-v7a`, `arm64-v8a`, `x86` and `x86_64`:
-
-```bash
-cd build/android
-python build_android_all.py
-```
-
-## Tests
-
-Tests are built when you build Nakama C++ SDK for desktop OS (Windows, Mac or Linux).
-
-By default tests connect to local server by `127.0.0.1`.
-To use another IP of your server, edit `test/test_serverConfig.h` file.
-
-### Prerequisites
-
-Tests reqire lua modules: download them from https://github.com/heroiclabs/nakama/tree/master/data/modules and put to `<nakama-server>/data/modules`.
-
-Restart server.
-
-### Run tests
-
-Run tests executable (console application):
-
-```bash
-build/{platform}/build/test/Debug/nakama-test
+cmake --preset linux-amd64 -DWITH_LIBCXX=ON
 ```
 
-## Full C++ Client example
+## Release
 
-You can find the C++ Client example [here](https://github.com/heroiclabs/nakama-cpp/tree/master/examples/nakama-cmake-client-example)
-
-## C language support
-
-Please follow [README-C](README-C.md)
-
-## Generating Docs
-
-Prerequisites: `doxygen`
-
-Generate docs:
-
-```bash
-cd docs
-doxygen Doxyfile
+```
+cmake --install --preset linux-amd64 --config MinSizeRel
 ```
 
-## License
+You should see dynamic library and headers in the `./out` directory. This is your release.
 
-This project is licensed under the [Apache-2 License](https://github.com/heroiclabs/nakama-dotnet/blob/master/LICENSE).
+It is safe to combine (overlay) multiple platforms releases in the same directory structure, because
+binary artifacts paths won't clash and include files are identical on all platforms.
 
-## Special Thanks
+### MacOSX Universal binary
 
-Thanks to [@dimon4eg](https://github.com/dimon4eg) for this excellent support on developing Nakama C/C++, Cocos2d-x and Unreal client libraries.
+Currently, our dependency manager can't build non-CMake based projects as universal binary.
+Watch [this PR](https://github.com/microsoft/vcpkg/pull/22898) for a proper fix. Until then
+building universal binaries requires building shared libs for `arm64` and `x86_64` architectures
+and gluing them together with [lipo](https://developer.apple.com/documentation/apple-silicon/building-a-universal-macos-binary/)
+tool.
+
+To build universal binary first compile individual shared lib for arm64 and x86_64. Following commands are for M1,
+adjust preset names if you are on Intel CPU:
+
+```
+cmake --preset macosx-x64-host_arm64
+cmake --build build/macosx-x64-host_arm64 --config MinSizeRel --target install
+
+cmake --preset macosx-arm64-host_arm64
+cmake --build build/macosx-arm64-host_arm64 --config MinSizeRel --target install
+```
+
+```
+cp -r out/macosx-x64 out/macosx-universal
+lipo -create -output out/macosx-universal/nakama-sdk.framework/Versions/A/nakama-sdk out/macosx-{arm64,x64}/nakama-sdk.framework/nakama-sdk
+```
+
+You can then archive and release `out/osx-universal`  directory.
+
+## Transports
+
+Platforms vary in their implementation of transports for HTTP and WS. One of the
+transports, `libhttpclient` itself can use different implementations depending on the platform.
+
+HTTP:
+
+Platform | Transport              |
+  --- |---------------------------|
+Windows | libhttpclient -> winhttp  |
+Android | libcurl                 |
+Linux | libhttpclient->curl       |
+MacOS | libhttpclient -> OS       |
+iOS   | libhttpclient -> OS       |
+Windows 7 | libhttpclient -> websocketpp |
+
+Websockets:
+
+Platform | Transport
+--- |------------------------------|
+Windows | libhttpclient -> winhttp |
+Android | wslay                    |
+Linux | wslay                      |
+MacOS | wslay                      |
+iOS   | wslay                      |
+Windows 7 | libhttpclient -> websocketpp |
+
+
+# How to integrate the SDK
+
+There are three ways of integrating the SDK into your build.
+
+## Github Release
+We provide headers and binaries for all supported platforms in our releases section.
+
+## CMake
+After downloading it to a folder you've configured CMake to look for targets in, you can import our package via the `find_package` command in CMake: `find_package(nakama-sdk)`.
+
+## vcpkg
+
+Our SDK integrates with vcpkg by providing itself and a few dependencies through a git registry. To include it in your vcpkg manifest, create a `vcpkg-configuration.json` in your root directory.
+```
+{
+    "registries":
+    [
+        {
+            "kind": "git",
+            "repository": "https://github.com/heroiclabs/nakama-vcpkg-registry",
+            "baseline": "<commit>",
+            "reference": "<branch>",
+            "packages": ["nakama-sdk", "wslay"]
+        }
+    ]
+}
+```
+Then you can add it as you would any other vcpkg port in your `vcpkg.json`:
+```
+    "dependencies": [
+      {
+        "name": "nakama-sdk"
+        "features": [<desired-feature-1>, <desired-feature-2>]
+      }]
+```
+
+vcpkg does not currently allow us to provide default features per platform, so you must specify your desired transports/features in your own vcpkg.json.
+
+For an example, look at how our [cocos-2d-x client](https://github.com/heroiclabs/nakama-cocos2d-x.git) does this. Also see our [our built-in transports](#transports) for each platform that we represent with vcpkg features. If you do not specify a transport for the platform, the client will expect you to pass in your own at runtime.

@@ -1,0 +1,32 @@
+name: 'Setup Ubuntu'
+description: 'Sets up prereqs for all ubuntu machines'
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        install_ninja() {
+          (
+            mkdir -p ~/bin
+            cd /tmp
+            curl -L -O https://github.com/ninja-build/ninja/releases/download/v1.11.0/ninja-linux.zip
+            unzip ninja-linux.zip
+            mv ninja /usr/local/bin/
+          )
+          ninja --version 2>/dev/null
+        }
+
+        # vcpkg wants mono, make sure it finds one
+        # see: https://github.com/microsoft/vcpkg/issues/25585
+        ensure_mono() {
+          type -p mono || {
+            # mono not found, lets try dotnet
+            type -p dotnet || { echo "ERROR: neither mono nor dotnet found"; exit 1; }
+            ln -s "$(type -p dotnet)" ~/bin/
+          }
+          mono --version >/dev/null
+        }
+
+        ninja --version 2>/dev/null || install_ninja
+        ensure_mono
+      shell: bash
+

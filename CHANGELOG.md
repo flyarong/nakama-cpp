@@ -4,6 +4,93 @@ All notable changes to this project are documented below.
 
 The format is based on [keep a changelog](http://keepachangelog.com/) and this project uses [semantic versioning](http://semver.org/).
 
+### [2.7.2] - [2023-03-15]
+### Added
+- Added support for listing matches with a query.
+
+### Fixed
+- Fixed encoding issue with some cursors sent to the server.
+- Fixed an exception that could be thrown when the client sent match data over a bad network.
+- Upgraded libcurl to 7.88.1 which fixed a rare Websocket SSL handshake issue on Unix systems.
+- Fixed base64 dependency in Android SSL for broader Android API level support.
+
+### Changed
+- Improved build automation around test suite.
+
+### [2.7.1] - [2023-02-23]
+### Fixed
+- Restore armeabi-v7a Android support.
+- Fixed an issue where SSL certificates for the libcurl transport were not loaded properly if the JavaVM was shared with other libraries.
+
+### [2.7.0] - [2023-02-15]
+### Added
+- Windows x86 support
+- Support for vcpkg consumption. See README.md for examples.
+- The test suite is now runnable on iOS and Android devices.
+- Added a libcurl network transport and specified it as the default for Android.
+- Android builds can now be made on ARM macs.
+- Nakama can now be included via users by CMake `find_package(nakama-sdk)` calls.
+
+### Changed
+- Removed ability to create default client and realtime clients if no default transport is specified for the platform (`createDefaultClient`, `createDefaultRtClient`). This will only affect users who use vcpkg or CMake to explicitly toggle off our default transports.
+- Simplfied the Android build toolchain. The entry point is now standardized with our other platforms using the `cmake --preset ...` pattern.
+
+### Fixed
+- We now publish header and debug binaries for Windows
+- Platforms using our wslay adapter (Android, Linux, Mac, iOS) now trigger `onDisconnect` on error.
+- Fixed an issue where the web socket would hang on slower network connections.
+- Fixed authenticateRefresh in the GrpcClient.
+- Added CFBundleVersion to MacOSX frameworks which is required for the app store upload process.
+
+
+### [2.6.0] - [2022-09-02]
+
+### Changed
+- This is a rewrite of the C++ repository structure and build system. The user-facing API remains unchanged.
+
+### [2.5.1] - [2022-01-16]
+
+### Fixed
+- Fixed Party & Matchmaking callbacks.
+- Fixed removeMatchmakerParty API.
+
+### [2.5.0] - [2021-07-29]
+
+### Added
+- Added realtime parties support.
+
+### Fixed
+- Fixed assignment of cursor in listing of storage objects.
+
+## [2.4.1] - [2021-01-16]
+### Fixed
+- fix join group chat by correcting NChannelType enum values
+
+## [2.4.0] - [2020-11-01]
+### Added
+- Support server 2.13.0
+- Added authentication with Apple ID: `authenticateApple`, `linkApple` and `unlinkApple`
+- Added `demoteGroupUsers`
+- Added `NClientInterface::rpc` with `http key`
+- Added `disableTime` to `NAccount`
+- Added `updateTime` to `NFriend`
+- Improve future-compatibility with server changes
+
+### Fixed
+- Fix #36 listFriends failing on 2.3.0 against 2.13.0 server
+
+## [2.3.0] - [2020-02-29]
+### Added
+- support Windows 10 SDK
+- support build for android on linux
+
+### Fixed
+- fix crash when response is received after NClient was deleted
+- fix build with CMake 3.15+ on Windows 10
+
+### Changed
+- speedup build for Linux
+
 ## [2.2.4] - 2019-11-21
 ### Added
 - install_deps.sh for linux to install dependencies
